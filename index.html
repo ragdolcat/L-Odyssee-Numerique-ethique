@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Souveraineté : La Course contre GAFAM</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="game-container">
+        
+        <div id="race-track">
+            <div id="race-progress"></div>
+            <div id="race-marker">🏁 Arrivée</div>
+            <div id="player-icon">🏃‍♂️</div>
+        </div>
+
+        <div id="start-screen">
+            <div class="icon-header">🍄</div>
+            <h1>Super Souveraineté</h1>
+            <p class="intro-text">
+                Lancez-vous dans la course pour libérer votre école de l'emprise des GAFAM !<br>
+                Votre carburant : le temps gagné en répondant correctement aux questions.
+            </p>
+            <div class="rules">
+                <p>⏱️ <strong>LA COURSE :</strong> Le temps total de la partie diminue sans cesse.</p>
+                <p>⭐ <strong>GAGNER :</strong> Répondez bien et vite pour regagner du temps bonus.</p>
+                <p>💀 <strong>PERDRE :</strong> Si le temps de la course atteint zéro, c'est le **Game Over** !</p>
+            </div>
+            <button class="btn btn-primary" id="start-btn">Commencer la Course</button>
+        </div>
+
+        <div id="game-screen" class="hide">
+            <div class="hud">
+                <div class="hud-item">Score Total: <span id="score">0</span></div>
+                <div class="hud-item">Étape: <span id="question-count">1/8</span></div>
+            </div>
+            
+            <div class="timer-container question-timer">
+                <div class="timer-bar" id="timer-bar"></div>
+            </div>
+            
+            <div id="question-area" class="animate-fade">
+                <h2 id="question-text">...</h2>
+                <div id="interaction-area"></div>
+            </div>
+
+            <div id="feedback-area" class="hide">
+                <h3 id="feedback-title">Résultat</h3>
+                <p id="feedback-text"></p>
+                <p id="time-bonus-display" class="bonus-msg"></p>
+                <button class="btn btn-next" id="next-btn">Étape Suivante →</button>
+            </div>
+        </div>
+
+        <div id="end-screen" class="hide">
+            <div class="icon-header" id="end-icon">🎉</div>
+            <h1><span id="end-title">Mission Accomplie !</span></h1>
+            <p id="final-message">...</p>
+            <div class="final-score-display">
+                Score Final: <span id="final-score">0</span> pts
+            </div>
+            <button class="btn btn-primary" id="restart-btn">Recommencer</button>
+            <div id="score-submission-area" style="margin-top: 20px;">
+                <h3>Enregistrez votre score !</h3>
+                <input type="text" id="player-name-input" placeholder="Votre nom / initiales" maxlength="30" class="input-text">
+                <button class="btn btn-primary" id="submit-score-btn" style="margin-top: 10px;">Enregistrer</button>
+            </div>
+            
+            <div id="submission-message" style="margin-top: 10px; font-weight: bold;"></div>
+
+            <h2 style="margin-top: 30px;">🏆 Top 10 des champions</h2>
+            <div id="leaderboard-container">
+                <p>Chargement du classement...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

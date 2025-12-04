@@ -1,0 +1,154 @@
+:root {
+    --bg-color: #e0f7fa;
+    --card-bg: #ffffff;
+    --primary: #0097e6;
+    --secondary: #00cec9;
+    --text-main: #2d3436;
+    --success: #27ae60;
+    --error: #c0392b;
+    --race-track-color: #81ecec;
+    --race-progress-color: #00b894;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-color);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-main);
+}
+
+#game-container {
+    background: var(--card-bg);
+    width: 90%;
+    max-width: 700px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    padding: 30px;
+    text-align: center;
+    position: relative; /* Pour positionner l'icône du joueur */
+}
+
+/* --- RACE TRACK STYLES --- */
+#race-track {
+    width: 90%;
+    height: 30px;
+    background-color: var(--race-track-color);
+    border-radius: 15px;
+    margin: 0 auto 30px;
+    border: 3px solid #636e72;
+    overflow: hidden;
+    position: relative;
+}
+
+#race-progress {
+    height: 100%;
+    background: var(--race-progress-color);
+    width: 100%;
+    transform-origin: left;
+    transition: width 0.5s ease-out; /* Transition plus douce pour le temps */
+}
+
+#player-icon {
+    position: absolute;
+    top: -10px;
+    left: 0;
+    font-size: 2rem;
+    transition: left 0.5s ease-out;
+    z-index: 10;
+}
+
+#race-marker {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    z-index: 5;
+}
+
+/* --- BONUS MESSAGE --- */
+.bonus-msg {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--success);
+    margin: 10px 0 0;
+    animation: bounceIn 0.5s ease-out;
+}
+
+/* Autres styles conservés (QCM, Match, Gap) */
+h1 { color: var(--primary); }
+h2 { font-size: 1.3rem; margin-bottom: 20px; color: #34495e; }
+.icon-header { font-size: 3rem; }
+
+/* BOUTONS GENERAUX */
+.btn {
+    border: none;
+    padding: 12px 25px;
+    font-size: 1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 15px;
+    transition: transform 0.1s;
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { transform: scale(1.05); }
+.btn-next { background: var(--text-main); color: white; }
+
+.input-text {
+    padding: 10px;
+    border: 2px solid #bdc3c7;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 250px;
+    font-size: 1rem;
+}
+
+/* TIMER */
+.hud { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 15px; font-size: 1.1rem; color: var(--primary); }
+.question-timer { width: 100%; height: 8px; background: #dfe6e9; border-radius: 4px; margin-bottom: 20px; }
+.timer-bar { height: 100%; background: var(--secondary); width: 100%; transform-origin: left; }
+
+/* FEEDBACK */
+#feedback-area {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #f1f2f6;
+    text-align: left;
+    border-left: 5px solid var(--primary);
+}
+.analogie { font-style: italic; color: #555; margin-top: 5px; display: block;}
+
+/* QCM, MATCH, GAP styles (comme avant) */
+.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.option-btn { background: white; border: 2px solid #bdc3c7; padding: 15px; border-radius: 10px; cursor: pointer; font-size: 1rem; }
+.option-btn:hover { background: #ecf0f1; border-color: var(--primary); }
+
+.match-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.match-column { display: flex; flex-direction: column; gap: 10px; }
+.match-card { padding: 15px; border: 2px solid #bdc3c7; border-radius: 8px; cursor: pointer; background: white; transition: 0.2s; }
+.match-card.selected { border-color: var(--primary); background: #dff9fb; box-shadow: 0 0 5px var(--primary); }
+.match-card.matched { border-color: var(--success); background: #dff9fb; opacity: 0.5; pointer-events: none; }
+
+.sentence-container { font-size: 1.2rem; line-height: 2; margin-bottom: 20px; }
+.gap-spot { display: inline-block; min-width: 80px; border-bottom: 2px dashed var(--primary); color: var(--primary); font-weight: bold; padding: 0 5px; cursor: pointer; }
+.word-bank { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.word-tag { background: #dfe6e9; padding: 5px 15px; border-radius: 15px; cursor: pointer; border: 1px solid #b2bec3; }
+.word-tag:hover { background: #b2bec3; }
+
+/* UTILITAIRES */
+.hide { display: none !important; }
+.correct { background: #badc58 !important; border-color: #6ab04c !important; }
+.wrong { background: #ffbe76 !important; border-color: #eb4d4b !important; }
+
+@keyframes bounceIn {
+    0% { opacity: 0; transform: scale(0.5); }
+    100% { opacity: 1; transform: scale(1); }
+}
