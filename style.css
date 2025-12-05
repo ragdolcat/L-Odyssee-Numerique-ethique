@@ -83,7 +83,7 @@ body {
 
 /* Autres styles conservés (QCM, Match, Gap) */
 h1 { color: var(--primary); }
-h2 { font-size: 1.3rem; margin-bottom: 20px; color: #34495e; }
+h2 { font-size: 1.3rem; margin-bottom: 20px; color: #ff2222; }
 .icon-header { font-size: 3rem; }
 
 /* BOUTONS GENERAUX */
@@ -97,9 +97,9 @@ h2 { font-size: 1.3rem; margin-bottom: 20px; color: #34495e; }
     margin-top: 15px;
     transition: transform 0.1s;
 }
-.btn-primary { background: var(--primary); color: white; }
+.btn-primary { background: var(--primary); color: #c0392b; }
 .btn-primary:hover { transform: scale(1.05); }
-.btn-next { background: var(--text-main); color: white; }
+.btn-next { background: var(--text-main); color: #c0392b; }
 
 .input-text {
     padding: 10px;
