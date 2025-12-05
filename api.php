@@ -1,19 +1,24 @@
 <?php
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *'); // Sécurité à vérifier en production
+header('Access-Control-Allow-Origin: *'); 
 header('Access-Control-Allow-Methods: GET, POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// --- PARAMÈTRES DE CONNEXION À LA BASE DE DONNÉES ---
+// --- PARAMÈTRES DE CONNEXION À LA BASE DE DONNÉES (MIS À JOUR) ---
+// Extrait de: mysql://Odyssee_wallsheet:eeeb055c7daccfaebff1f9773478e8146256026b@lpri1s.h.filess.io:61002/Odyssee_wallsheet
+
+$user = 'Odyssee_wallsheet';   
+$pass = 'eeeb055c7daccfaebff1f9773478e8146256026b';  
 $host = 'lpri1s.h.filess.io';
-$db   = 'Odyssee_wallsheet'; // VOTRE BDD
-$user = 'Odyssee_wallsheet';   // VOTRE USER
-$port = '61002';
-$pass = 'eeeb055c7daccfaebff1f9773478e8146256026b';  // VOTRE MDP
+$port = '61002'; // Le port est maintenant inclus
+$db   = 'Odyssee_wallsheet'; 
+
 $charset = 'utf8mb4';
 $questions_to_fetch = 8;
 
-$dsn = "mysql:host=$host;dbname=$db;port=$port;charset=$charset";
+// Construction de la DSN (incluant le port)
+$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
+
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
