@@ -2,7 +2,7 @@
 // Retiré : const questionPool est maintenant remplacé par le fetching
 const QUESTIONS_PER_GAME = 8;
 const BASE_TIME = 25; // Secondes
-const API_URL = 'api.php'; // LE CHEMIN VERS VOTRE NOUVEAU FICHIER PHP
+const API_URL = 'api.php';
 
 // --- LOGIQUE DU JEU ---
 let currentQuestions = [];
@@ -12,7 +12,6 @@ let timerObj;
 let timeLeft = BASE_TIME;
 let gameActive = false;
 
-// --- ÉLÉMENTS DOM (Le reste du fichier JS n'a pas changé) ---
 const dom = {
     startScreen: document.getElementById('start-screen'),
     gameScreen: document.getElementById('game-screen'),
@@ -24,15 +23,20 @@ const dom = {
     feedbackArea: document.getElementById('feedback-area'),
     feedbackText: document.getElementById('feedback-text'),
     feedbackTitle: document.getElementById('feedback-title'),
-    nextBtn: document.getElementById('next-btn')
+    nextBtn: document.getElementById('next-btn'),
+    finalScore: document.getElementById('final-score'),
+    playerNameInput: document.getElementById('player-name-input'),
+    submitScoreBtn: document.getElementById('submit-score-btn'),
+    submissionMessage: document.getElementById('submission-message'),
+    leaderboardContainer: document.getElementById('leaderboard-container')
 };
 
 // Initialisation
 document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('restart-btn').addEventListener('click', startGame);
 dom.nextBtn.addEventListener('click', nextQuestion);
+dom.submitScoreBtn.addEventListener('click', submitScore);
 
-// --- NOUVELLE FONCTION DE CHARGEMENT ASYNCHRONE ---
 async function fetchQuestions() {
     dom.questionText.innerText = "Chargement des questions depuis la base de données...";
     dom.interactionArea.innerHTML = '';
@@ -289,10 +293,76 @@ function nextQuestion() {
 function endGame() {
     dom.gameScreen.classList.add('hide');
     dom.endScreen.classList.remove('hide');
-    document.getElementById('final-score').innerText = score;
+    dom.finalScore.innerText = score;
+    
+    // Afficher la zone de soumission et le classement
+    document.getElementById('score-submission-area').classList.remove('hide');
+    dom.submissionMessage.innerText = '';
     
     const msg = document.getElementById('final-message');
     if(score > 1500) msg.innerText = "🥇 Excellent ! Le monde du Libre n'a plus de secrets pour vous.";
     else if(score > 800) msg.innerText = "🥈 Bien joué ! Vous avez compris l'essentiel.";
     else msg.innerText = "🥉 C'est un début ! Continuez à explorer ces sujets importants.";
+    
+    // Afficher le classement
+    displayLeaderboard();
+}
+
+async function submitScore() {
+    const name = dom.playerNameInput.value.trim();
+    if (name.length < 2) {
+        dom.submissionMessage.innerText = "Veuillez entrer au moins 2 caractères.";
+        return;
+    }
+
+    dom.submitScoreBtn.disabled = true;
+    dom.submissionMessage.innerText = "Enregistrement en cours...";
+
+    try {
+        const response = await fetch(`${API_URL}?action=submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name, score: score })
+        });
+        
+        const result = await response.json();
+
+        if (result.success) {
+            dom.submissionMessage.innerText = `🥳 Score de ${score} enregistré avec succès !`;
+            document.getElementById('score-submission-area').classList.add('hide');
+            displayLeaderboard(); // Recharger le classement
+        } else {
+            dom.submissionMessage.innerText = `Échec de l'enregistrement: ${result.message}`;
+        }
+    } catch (error) {
+        console.error("Erreur de soumission:", error);
+        dom.submissionMessage.innerText = "Erreur réseau lors de l'enregistrement.";
+    } finally {
+        dom.submitScoreBtn.disabled = false;
+    }
+}
+
+async function displayLeaderboard() {
+    dom.leaderboardContainer.innerHTML = '<p>Chargement du classement...</p>';
+
+    try {
+        const response = await fetch(`${API_URL}?action=leaderboard`);
+        const result = await response.json();
+
+        if (result.success && result.leaderboard.length > 0) {
+            let html = '<ol>';
+            result.leaderboard.forEach((item, index) => {
+                const rank = index + 1;
+                const medal = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : (rank === 3 ? '🥉' : ''));
+                html += `<li>${medal} <strong>${item.player_name}</strong> - ${item.score} pts (${item.date})</li>`;
+            });
+            html += '</ol>';
+            dom.leaderboardContainer.innerHTML = html;
+        } else {
+            dom.leaderboardContainer.innerHTML = '<p>Aucun score enregistré pour l\'instant. Soyez le premier !</p>';
+        }
+    } catch (error) {
+        console.error("Erreur de récupération du classement:", error);
+        dom.leaderboardContainer.innerHTML = '<p style="color:red;">Erreur lors du chargement du classement.</p>';
+    }
 }
