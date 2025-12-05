@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Rétro Défi</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+    
+    <div id="selection-screen">
+        <h1>🐍 Configurez votre Défi</h1>
+        
+        <div id="coins-bar">
+             <span id="player-coins">COINS: 0 💰</span>
+        </div>
+        
+        <div class="selection-section">
+            <h2>Niveau de Difficulté</h2>
+            <div class="option-group" id="difficulty-options">
+                <button data-difficulty="easy" class="mode-button">Facile (200ms)</button>
+                <button data-difficulty="medium" class="mode-button selected">Moyen (150ms)</button>
+                <button data-difficulty="hard" class="mode-button">Difficile (100ms)</button>
+            </div>
+        </div>
+
+        <div class="selection-section">
+            <h2>Thème Visuel du Fond</h2>
+            <div class="option-group" id="background-options">
+                <button data-background="neon" class="bg-button selected">Néon Pulsé</button>
+                <button data-background="classic" class="bg-button">Rétro Arcade</button>
+                <button data-background="space" class="bg-button">Cosmique</button>
+            </div>
+        </div>
+        
+        <div class="selection-section">
+            <h2>Skins (Boutique)</h2>
+            <div class="option-group" id="snake-skin-options">
+                </div>
+        </div>
+        
+        <div id="preview-container">
+            <div id="game-board-preview"></div>
+        </div>
+
+        <button id="start-game-button" class="action-button">DÉMARRER LA PARTIE</button>
+    </div>
+    
+    <div id="game-wrapper" style="display: none;">
+        <div id="main-content">
+            
+            <div id="game-container">
+                <div id="header-bar">
+                    <span id="score">SCORE: 0</span>
+                    <span id="inversion-timer"></span>
+                    
+                    <span id="powerup-display"></span> 
+                    
+                    <button id="back-to-menu-button" class="action-button small-button">MENU</button>
+                </div>
+                
+                <div id="game-board"></div> 
+            </div>
+
+            <div id="leaderboard-container">
+                <h2>🏆 Top Scores</h2>
+                <ul id="leaderboard-list">
+                    </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script> 
+</body>
+</html>
