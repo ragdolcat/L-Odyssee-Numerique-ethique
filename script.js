@@ -408,3 +408,43 @@ document.addEventListener('keydown', (e) => {
         sequenceClavier = '';
     }
 });
+
+/**
+ * Logique de détection du code "snake" pour rediriger vers le mini-jeu.
+ * Basé sur la surveillance des frappes clavier (similaire au Code Konami).
+ */
+ // Tampon pour stocker les dernières touches tapées
+
+document.addEventListener('keydown', (e) => {
+    // 1. Convertir la touche en minuscule pour éviter les problèmes de majuscule/minuscule
+    const touchePressee = e.key.toLowerCase();
+    
+    // 2. S'assurer que la touche est bien une lettre (pour ignorer Ctrl, Alt, F5, etc.)
+    // La condition (touchePressee.length === 1 && touchePressee >= 'a' && touchePressee <= 'z') vérifie si c'est une seule lettre.
+    if (touchePressee.length === 1 && touchePressee >= 'a' && touchePressee <= 'z') {
+        
+        // Ajouter la touche au tampon de séquence
+        sequenceClavier += touchePressee;
+        
+        // Ne garder que les dernières lettres nécessaires (5 pour "snake")
+        if (sequenceClavier.length > CODE_SECRET.length) {
+            sequenceClavier = sequenceClavier.slice(-CODE_SECRET.length);
+        }
+        
+        // 3. Vérifier si le tampon correspond au code secret
+        if (sequenceClavier === CODE_SECRET) {
+            console.log("Code SNAKE entré ! Redirection vers le mini-jeu...");
+            
+            // 4. Redirection vers le jeu
+            // Le chemin "./snake/index.html" est relatif à la page actuelle.
+            window.location.href = './snake/index.html';
+            
+            // OPTIONNEL : Réinitialiser la séquence après le succès
+            sequenceClavier = ''; 
+        }
+    } else {
+        // Si l'utilisateur tape une touche non-alphabétique (Espace, Entrée, etc.), 
+        // on réinitialise la séquence pour éviter un match accidentel.
+        sequenceClavier = '';
+    }
+});
