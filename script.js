@@ -1,10 +1,8 @@
 // --- CONFIGURATION ---
-// Retiré : const questionPool est maintenant remplacé par le fetching
-const QUESTIONS_PER_GAME = 8;
-const BASE_TIME = 25; // Secondes
-const API_URL = 'api.php'; // LE CHEMIN VERS VOTRE NOUVEAU FICHIER PHP
+const BASE_TIME = 25; // Secondes pour répondre
+const API_URL = 'api.php'; // Chemin vers le fichier API PHP
 
-// --- LOGIQUE DU JEU ---
+// --- LOGIQUE GLOBALE DU JEU ---
 let currentQuestions = [];
 let currentIndex = 0;
 let score = 0;
@@ -12,7 +10,7 @@ let timerObj;
 let timeLeft = BASE_TIME;
 let gameActive = false;
 
-// --- ÉLÉMENTS DOM (Le reste du fichier JS n'a pas changé) ---
+// --- ÉLÉMENTS DOM ---
 const dom = {
     startScreen: document.getElementById('start-screen'),
     gameScreen: document.getElementById('game-screen'),
@@ -25,19 +23,26 @@ const dom = {
     feedbackText: document.getElementById('feedback-text'),
     feedbackTitle: document.getElementById('feedback-title'),
     nextBtn: document.getElementById('next-btn'),
+    
+    // Éléments du Leaderboard
+    finalScore: document.getElementById('final-score'),
     playerNameInput: document.getElementById('player-name-input'),
     submitScoreBtn: document.getElementById('submit-score-btn'),
     submissionMessage: document.getElementById('submission-message'),
     leaderboardContainer: document.getElementById('leaderboard-container')
 };
 
-// Initialisation
-document.getElementById('start-btn').addEventListener('click', startGame);
-document.getElementById('restart-btn').addEventListener('click', startGame);
-dom.nextBtn.addEventListener('click', nextQuestion);
-dom.submitScoreBtn.addEventListener('click', submitScore);
+// --- INITIALISATION & LISTENERS ---
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('start-btn').addEventListener('click', startGame);
+    document.getElementById('restart-btn').addEventListener('click', startGame);
+    dom.nextBtn.addEventListener('click', nextQuestion);
+    dom.submitScoreBtn.addEventListener('click', submitScore);
+});
 
-// --- NOUVELLE FONCTION DE CHARGEMENT ASYNCHRONE ---
+
+// --- GESTION DE LA BASE DE DONNÉES (FETCHING) ---
+
 async function fetchQuestions() {
     dom.questionText.innerText = "Chargement des questions depuis la base de données...";
     dom.interactionArea.innerHTML = '';
@@ -62,6 +67,8 @@ async function fetchQuestions() {
     }
 }
 
+// --- GESTION DU JEU ---
+
 async function startGame() {
     score = 0;
     currentIndex = 0;
@@ -71,13 +78,11 @@ async function startGame() {
     dom.gameScreen.classList.remove('hide');
     dom.score.innerText = '0';
     
-    // 1. Récupération des questions avant de commencer
     currentQuestions = await fetchQuestions(); 
 
     if (currentQuestions.length > 0) {
         loadQuestion();
     } else {
-        // Gérer le cas où la base de données est vide ou l'API a échoué
         dom.questionText.innerText = "Aucune question chargée. Veuillez vérifier la connexion à la base de données.";
     }
 }
@@ -94,7 +99,7 @@ function loadQuestion() {
     dom.feedbackArea.classList.add('hide');
     dom.nextBtn.style.display = 'none';
 
-    // Rendu selon le type (le type est maintenant dans qData.type)
+    // Rendu selon le type
     if (qData.type === 'choice') renderChoice(qData);
     else if (qData.type === 'match') renderMatch(qData);
     else if (qData.type === 'gap') renderGap(qData);
@@ -102,11 +107,83 @@ function loadQuestion() {
     startTimer();
 }
 
-// --- RENDU : QCM ---
+function stopGame(isWin) {
+    gameActive = false;
+    clearInterval(timerObj);
+    dom.timerBar.style.transition = 'none';
+
+    const qData = currentQuestions[currentIndex];
+    
+    if(isWin) {
+        const pts = 100 + (timeLeft * 10);
+        score += pts;
+        dom.feedbackTitle.innerText = "✅ Bravo !";
+        dom.feedbackTitle.style.color = "var(--success)";
+    } else {
+        dom.feedbackTitle.innerText = "❌ Dommage...";
+        dom.feedbackTitle.style.color = "var(--error)";
+    }
+
+    dom.score.innerText = score;
+    
+    let html = `<strong>Explication :</strong> ${qData.desc}`;
+    if(qData.analogie) {
+        html += `<br><span class="analogie">💡 Analogie : ${qData.analogie}</span>`;
+    }
+    dom.feedbackText.innerHTML = html;
+    
+    dom.feedbackArea.classList.remove('hide');
+    dom.nextBtn.style.display = 'inline-block';
+}
+
+function nextQuestion() {
+    currentIndex++;
+    if(currentIndex < currentQuestions.length) {
+        loadQuestion();
+    } else {
+        endGame();
+    }
+}
+
+function startTimer() {
+    clearInterval(timerObj);
+    dom.timerBar.style.transition = 'none';
+    dom.timerBar.style.transform = 'scaleX(1)';
+    void dom.timerBar.offsetWidth; // Force reflow
+    dom.timerBar.style.transition = `transform ${BASE_TIME}s linear`;
+    dom.timerBar.style.transform = 'scaleX(0)';
+
+    timerObj = setInterval(() => {
+        timeLeft--;
+        if(timeLeft <= 0) stopGame(false);
+    }, 1000);
+}
+
+function endGame() {
+    dom.gameScreen.classList.add('hide');
+    dom.endScreen.classList.remove('hide');
+    dom.finalScore.innerText = score;
+    
+    document.getElementById('score-submission-area').classList.remove('hide');
+    dom.submissionMessage.innerText = '';
+    
+    const msg = document.getElementById('final-message');
+    if(score > 1500) msg.innerText = "🥇 Excellent ! Le monde du Libre n'a plus de secrets pour vous.";
+    else if(score > 800) msg.innerText = "🥈 Bien joué ! Vous avez compris l'essentiel.";
+    else msg.innerText = "🥉 C'est un début ! Continuez à explorer ces sujets importants.";
+    
+    displayLeaderboard();
+}
+
+// --- RENDU ET VÉRIFICATION DES RÉPONSES (CORRIGÉ POUR ACCÉDER À qData.data.*) ---
+
+// 1. QCM
 function renderChoice(qData) {
+    const options = qData.data.options; // CORRIGÉ
+    
     const grid = document.createElement('div');
     grid.className = 'options-grid';
-    qData.options.forEach((opt, idx) => {
+    options.forEach((opt, idx) => {
         const btn = document.createElement('button');
         btn.className = 'option-btn';
         btn.innerText = opt;
@@ -118,30 +195,33 @@ function renderChoice(qData) {
 
 function checkChoice(idx, btn, qData) {
     if(!gameActive) return;
-    stopGame(idx === qData.correct);
     
-    // Visuel
+    // CORRIGÉ : accès via qData.data.correct
+    stopGame(idx === qData.data.correct); 
+    
     const buttons = document.querySelectorAll('.option-btn');
-    buttons[qData.correct].classList.add('correct');
-    if (idx !== qData.correct) btn.classList.add('wrong');
+    buttons[qData.data.correct].classList.add('correct'); // CORRIGÉ
+    if (idx !== qData.data.correct) btn.classList.add('wrong'); // CORRIGÉ
 }
 
-// --- RENDU : ASSOCIATION (MATCH) ---
+
+// 2. ASSOCIATION
 let matchesFound = 0;
 let selectedLeft = null;
 let totalPairs = 0;
 
 function renderMatch(qData) {
+    const pairs = qData.data.pairs; // CORRIGÉ
+    
     matchesFound = 0;
-    totalPairs = qData.pairs.length;
+    totalPairs = pairs.length;
     selectedLeft = null;
 
     const container = document.createElement('div');
     container.className = 'match-container';
 
-    // Mélanger colonnes
-    const leftItems = qData.pairs.map((p, i) => ({txt: p.left, id: i}));
-    const rightItems = qData.pairs.map((p, i) => ({txt: p.right, id: i})).sort(() => 0.5 - Math.random());
+    const leftItems = pairs.map((p, i) => ({txt: p.left, id: i}));
+    const rightItems = pairs.map((p, i) => ({txt: p.right, id: i})).sort(() => 0.5 - Math.random());
 
     const colLeft = document.createElement('div'); colLeft.className = 'match-column';
     const colRight = document.createElement('div'); colRight.className = 'match-column';
@@ -172,16 +252,13 @@ function renderMatch(qData) {
 function handleMatchClick(div, side) {
     if(!gameActive || div.classList.contains('matched')) return;
 
-    // Si clic gauche
     if(side === 'left') {
         if(selectedLeft) selectedLeft.classList.remove('selected');
         selectedLeft = div;
         div.classList.add('selected');
     } 
-    // Si clic droit
     else if(side === 'right' && selectedLeft) {
         if(selectedLeft.dataset.id === div.dataset.id) {
-            // Match !
             selectedLeft.classList.add('matched');
             div.classList.add('matched');
             selectedLeft.classList.remove('selected');
@@ -189,28 +266,31 @@ function handleMatchClick(div, side) {
             matchesFound++;
             if(matchesFound === totalPairs) stopGame(true);
         } else {
-            // Pas match
             div.classList.add('wrong');
             setTimeout(() => div.classList.remove('wrong'), 500);
         }
     }
 }
 
-// --- RENDU : TEXTE A TROUS (GAP) ---
+
+// 3. TEXTE À TROUS
 function renderGap(qData) {
+    const sentence = qData.data.sentence; // CORRIGÉ
+    const answers = qData.data.answers;   // CORRIGÉ
+    const fake = qData.data.fake;         // CORRIGÉ
+    
     const container = document.createElement('div');
     
-    // Phrase
     const p = document.createElement('p');
     p.className = 'sentence-container';
-    const parts = qData.sentence.split('[1]');
+    const parts = sentence.split('[1]'); // Utilise 'sentence' corrigée
     p.innerHTML = `${parts[0]}<span class="gap-spot" id="gap-target">???</span>${parts[1]}`;
     container.appendChild(p);
 
-    // Mots
     const bank = document.createElement('div');
     bank.className = 'word-bank';
-    const allWords = [...qData.answers, ...qData.fake].sort(() => 0.5 - Math.random());
+    
+    const allWords = [...answers, ...fake].sort(() => 0.5 - Math.random()); // Utilise 'answers' et 'fake' corrigés
     
     allWords.forEach(word => {
         const tag = document.createElement('div');
@@ -220,13 +300,14 @@ function renderGap(qData) {
             if(!gameActive) return;
             const target = document.getElementById('gap-target');
             target.innerText = word;
-            // Vérification immédiate
-            if(word === qData.answers[0]) {
+            
+            // CORRIGÉ : Accès via qData.data.answers
+            if(word === qData.data.answers[0]) { 
                 target.style.color = "var(--success)";
                 stopGame(true);
             } else {
                 target.style.color = "var(--error)";
-                tag.style.background = "#fab1a0"; // rouge pâle
+                tag.style.background = "#fab1a0";
             }
         };
         bank.appendChild(tag);
@@ -236,78 +317,8 @@ function renderGap(qData) {
     dom.interactionArea.appendChild(container);
 }
 
-// --- GESTION GLOBALE ---
 
-function startTimer() {
-    clearInterval(timerObj);
-    dom.timerBar.style.transition = 'none';
-    dom.timerBar.style.transform = 'scaleX(1)';
-    void dom.timerBar.offsetWidth; // Force reflow
-    dom.timerBar.style.transition = `transform ${BASE_TIME}s linear`;
-    dom.timerBar.style.transform = 'scaleX(0)';
-
-    timerObj = setInterval(() => {
-        timeLeft--;
-        if(timeLeft <= 0) stopGame(false);
-    }, 1000);
-}
-
-function stopGame(isWin) {
-    gameActive = false;
-    clearInterval(timerObj);
-    dom.timerBar.style.transition = 'none';
-
-    const qData = currentQuestions[currentIndex];
-    
-    if(isWin) {
-        const pts = 100 + (timeLeft * 10);
-        score += pts;
-        dom.feedbackTitle.innerText = "✅ Bravo !";
-        dom.feedbackTitle.style.color = "var(--success)";
-    } else {
-        dom.feedbackTitle.innerText = "❌ Dommage...";
-        dom.feedbackTitle.style.color = "var(--error)";
-    }
-
-    dom.score.innerText = score;
-    
-    // Construction explication + analogie
-    let html = `<strong>Explication :</strong> ${qData.desc}`;
-    if(qData.analogie) {
-        html += `<br><span class="analogie">💡 Analogie : ${qData.analogie}</span>`;
-    }
-    dom.feedbackText.innerHTML = html;
-    
-    dom.feedbackArea.classList.remove('hide');
-    dom.nextBtn.style.display = 'inline-block';
-}
-
-function nextQuestion() {
-    currentIndex++;
-    if(currentIndex < QUESTIONS_PER_GAME) {
-        loadQuestion();
-    } else {
-        endGame();
-    }
-}
-
-function endGame() {
-    dom.gameScreen.classList.add('hide');
-    dom.endScreen.classList.remove('hide');
-    dom.finalScore.innerText = score;
-    
-    // Afficher la zone de soumission et le classement
-    document.getElementById('score-submission-area').classList.remove('hide');
-    dom.submissionMessage.innerText = '';
-    
-    const msg = document.getElementById('final-message');
-    if(score > 1500) msg.innerText = "🥇 Excellent ! Le monde du Libre n'a plus de secrets pour vous.";
-    else if(score > 800) msg.innerText = "🥈 Bien joué ! Vous avez compris l'essentiel.";
-    else msg.innerText = "🥉 C'est un début ! Continuez à explorer ces sujets importants.";
-    
-    // Afficher le classement
-    displayLeaderboard();
-}
+// --- GESTION DU LEADERBOARD ---
 
 async function submitScore() {
     const name = dom.playerNameInput.value.trim();
@@ -331,7 +342,7 @@ async function submitScore() {
         if (result.success) {
             dom.submissionMessage.innerText = `🥳 Score de ${score} enregistré avec succès !`;
             document.getElementById('score-submission-area').classList.add('hide');
-            displayLeaderboard(); // Recharger le classement
+            displayLeaderboard();
         } else {
             dom.submissionMessage.innerText = `Échec de l'enregistrement: ${result.message}`;
         }
