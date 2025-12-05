@@ -1,9 +1,9 @@
 :root {
-    --bg-color: #e0f7fa;
-    --card-bg: #ffffff;
-    --primary: #0097e6;
+    --bg-color: #1a1a1a;
+    --card-bg: #5b5b5b;
+    --primary: #ff2222;
     --secondary: #00cec9;
-    --text-main: #2d3436;
+    --text-main: #f3f3f3;
     --success: #27ae60;
     --error: #c0392b;
     --race-track-color: #81ecec;
@@ -151,4 +151,18 @@ h2 { font-size: 1.3rem; margin-bottom: 20px; color: #34495e; }
 @keyframes bounceIn {
     0% { opacity: 0; transform: scale(0.5); }
     100% { opacity: 1; transform: scale(1); }
+}
+
+.logo {
+    max-width: 200px;
+    max-height: 200px;
+}
+
+.lien {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 15px;
+    color: #b6b6b6;
 }
