@@ -382,3 +382,29 @@ async function displayLeaderboard() {
         dom.leaderboardContainer.innerHTML = '<p style="color:red;">Erreur lors du chargement du classement.</p>';
     }
 }
+
+const CODE_SECRET = 'snake';
+let sequenceClavier = '';
+
+document.addEventListener('keydown', (e) => {
+    const touchePressee = e.key.toLowerCase();
+    
+    if (touchePressee.length === 1 && touchePressee >= 'a' && touchePressee <= 'z') {
+        
+        sequenceClavier += touchePressee;
+        
+        if (sequenceClavier.length > CODE_SECRET.length) {
+            sequenceClavier = sequenceClavier.slice(-CODE_SECRET.length);
+        }
+        
+        if (sequenceClavier === CODE_SECRET) {
+            console.log("Code SNAKE entré ! Redirection vers le mini-jeu...");
+            
+            window.location.href = './snake/index.html';
+            
+            sequenceClavier = ''; 
+        }
+    } else {
+        sequenceClavier = '';
+    }
+});
