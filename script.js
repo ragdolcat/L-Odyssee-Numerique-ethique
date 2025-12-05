@@ -2,7 +2,7 @@
 // Retiré : const questionPool est maintenant remplacé par le fetching
 const QUESTIONS_PER_GAME = 8;
 const BASE_TIME = 25; // Secondes
-const API_URL = 'api.php';
+const API_URL = 'api.php'; // LE CHEMIN VERS VOTRE NOUVEAU FICHIER PHP
 
 // --- LOGIQUE DU JEU ---
 let currentQuestions = [];
@@ -12,6 +12,7 @@ let timerObj;
 let timeLeft = BASE_TIME;
 let gameActive = false;
 
+// --- ÉLÉMENTS DOM (Le reste du fichier JS n'a pas changé) ---
 const dom = {
     startScreen: document.getElementById('start-screen'),
     gameScreen: document.getElementById('game-screen'),
@@ -24,7 +25,6 @@ const dom = {
     feedbackText: document.getElementById('feedback-text'),
     feedbackTitle: document.getElementById('feedback-title'),
     nextBtn: document.getElementById('next-btn'),
-    finalScore: document.getElementById('final-score'),
     playerNameInput: document.getElementById('player-name-input'),
     submitScoreBtn: document.getElementById('submit-score-btn'),
     submissionMessage: document.getElementById('submission-message'),
@@ -37,6 +37,7 @@ document.getElementById('restart-btn').addEventListener('click', startGame);
 dom.nextBtn.addEventListener('click', nextQuestion);
 dom.submitScoreBtn.addEventListener('click', submitScore);
 
+// --- NOUVELLE FONCTION DE CHARGEMENT ASYNCHRONE ---
 async function fetchQuestions() {
     dom.questionText.innerText = "Chargement des questions depuis la base de données...";
     dom.interactionArea.innerHTML = '';
