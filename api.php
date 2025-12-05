@@ -5,14 +5,15 @@ header('Access-Control-Allow-Methods: GET, POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
 // --- PARAMÈTRES DE CONNEXION À LA BASE DE DONNÉES ---
-$host = 'localhost';
-$db   = 'nom_de_votre_base'; // VOTRE BDD
-$user = 'utilisateur_bdd';   // VOTRE USER
-$pass = 'mot_de_passe_bdd';  // VOTRE MDP
+$host = 'lpri1s.h.filess.io';
+$db   = 'Odyssee_wallsheet'; // VOTRE BDD
+$user = 'Odyssee_wallsheet';   // VOTRE USER
+$port = '61002';
+$pass = 'eeeb055c7daccfaebff1f9773478e8146256026b';  // VOTRE MDP
 $charset = 'utf8mb4';
 $questions_to_fetch = 8;
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$dsn = "mysql:host=$host;dbname=$db;port=$port;charset=$charset";
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
