@@ -10,13 +10,14 @@ header('Access-Control-Allow-Headers: Content-Type');
 $user = 'if0_40603312';   
 $pass = '5FEZxVrgx0bcj';  
 $host = 'sql103.infinityfree.com';
+$port = '3306';
 $db   = 'if0_40603312_oddyssee'; 
 
 $charset = 'utf8mb4';
 $questions_to_fetch = 8;
 
 // Construction de la DSN (incluant le port)
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
 
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
