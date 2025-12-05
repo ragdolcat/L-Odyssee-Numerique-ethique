@@ -211,7 +211,8 @@ let selectedLeft = null;
 let totalPairs = 0;
 
 function renderMatch(qData) {
-    const pairs = qData.data.pairs; // CORRIGÉ
+    // --- CORRECTION CLÉ : Accès direct à qData.data ---
+    const pairs = qData.data; // <--- C'EST ICI LA CORRECTION
     
     matchesFound = 0;
     totalPairs = pairs.length;
@@ -220,12 +221,14 @@ function renderMatch(qData) {
     const container = document.createElement('div');
     container.className = 'match-container';
 
+    // Création des listes à afficher
     const leftItems = pairs.map((p, i) => ({txt: p.left, id: i}));
     const rightItems = pairs.map((p, i) => ({txt: p.right, id: i})).sort(() => 0.5 - Math.random());
 
     const colLeft = document.createElement('div'); colLeft.className = 'match-column';
     const colRight = document.createElement('div'); colRight.className = 'match-column';
 
+    // Rendu de la colonne de gauche
     leftItems.forEach(item => {
         const div = document.createElement('div');
         div.className = 'match-card';
@@ -235,6 +238,7 @@ function renderMatch(qData) {
         colLeft.appendChild(div);
     });
 
+    // Rendu de la colonne de droite
     rightItems.forEach(item => {
         const div = document.createElement('div');
         div.className = 'match-card';
